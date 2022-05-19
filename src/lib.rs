@@ -4,6 +4,14 @@
 #![warn(missing_copy_implementations)]
 #![warn(missing_debug_implementations)]
 #![warn(rustdoc::all)]
+#![allow(rustdoc::missing_doc_code_examples)]
+
+
+
+mod codeblock;
+mod cowstr;
+
+pub mod read;
 
 
 

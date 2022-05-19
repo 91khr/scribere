@@ -4,3 +4,12 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+thiserror = "1.0"
+pulldown-cmark = { version = "0.9", optional = true }
+
+[features]
+read_cmark = ["pulldown-cmark"]
+read_pandoc = []
+
+full = ["read_cmark", "read_pandoc"]
+default = []
