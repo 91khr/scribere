@@ -18,6 +18,8 @@ pub mod read;
 
 pub mod directory;
 
+pub mod dispatch;
+
 
 
 #[cfg(test)]
