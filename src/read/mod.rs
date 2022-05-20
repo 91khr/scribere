@@ -24,5 +24,6 @@ pub trait Read<'a> {
 
 
 
-#[cfg(any(feature = "read_cmark", test, doc))]
+#[cfg(feature = "read_cmark")]
+#[doc(cfg(feature = "read_cmark"))]
 pub mod cmark;

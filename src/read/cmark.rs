@@ -1,5 +1,5 @@
 /*!
-Read markdown by the [pulldown-cmark] library.
+Read markdown with the [pulldown-cmark] library.
 
 [pulldown-cmark]: https://docs.rs/pulldown-cmark/latest/pulldown_cmark/
 */

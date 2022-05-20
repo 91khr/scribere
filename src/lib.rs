@@ -5,6 +5,9 @@
 #![warn(missing_debug_implementations)]
 #![warn(rustdoc::all)]
 #![allow(rustdoc::missing_doc_code_examples)]
+#![feature(generic_associated_types)]
+#![feature(never_type)]
+#![feature(doc_cfg)]
 
 
 
@@ -12,6 +15,8 @@ mod codeblock;
 mod cowstr;
 
 pub mod read;
+
+pub mod directory;
 
 
 
