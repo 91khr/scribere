@@ -15,10 +15,11 @@ mod codeblock;
 mod cowstr;
 
 pub mod read;
-
 pub mod directory;
-
 pub mod dispatch;
+
+mod write_blocks;
+pub use write_blocks::write_blocks;
 
 
 
