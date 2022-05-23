@@ -28,3 +28,5 @@ pub trait Directory {
 
 
 pub mod dummydir;
+#[cfg(feature = "dir_tmpdir")]
+mod tmpdir;
