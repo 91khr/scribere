@@ -46,6 +46,5 @@ pub fn write_blocks<'a>(
 #[cfg(test)]
 mod tests {
     #[test]
-    fn some() {
-    }
+    fn some() {}
 }

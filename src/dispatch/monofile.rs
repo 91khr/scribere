@@ -13,6 +13,10 @@ use crate::codeblock::CodeBlock;
 
 /**
 Dispatch all received blocks into a single file.
+
+The file is specified through the constructor,
+and only the first invocation to [`dispatch()`](Dispatch::dispatch) would return `Some(path)`,
+latter invocations would return `None` directly.
 */
 #[derive(Debug, Copy, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct MonoFile<'a>(Option<&'a Path>);
