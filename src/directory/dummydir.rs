@@ -42,7 +42,7 @@ impl Directory for DummyDir {
     type DirError = !;
     type Writer<'a> = &'a mut Vec<u8>;
 
-    fn open_append<'a, 'b: 'a>(&'b mut self, path: &Path) -> Result<Self::Writer<'a>, Self::DirError> {
+    fn open_append<'a>(&'a mut self, path: &Path) -> Result<Self::Writer<'a>, Self::DirError> {
         Ok(self.ctnt.entry(path.to_path_buf()).or_default())
     }
 }

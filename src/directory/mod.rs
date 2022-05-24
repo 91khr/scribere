@@ -22,11 +22,12 @@ pub trait Directory {
     /// Errors of the directory operation.
     type DirError: std::error::Error;
     /// Open a file at a path relative to the directory for appending.
-    fn open_append<'a, 'b: 'a>(&'b mut self, path: &Path) -> Result<Self::Writer<'a>, Self::DirError>;
+    fn open_append<'a>(&'a mut self, path: &Path) -> Result<Self::Writer<'a>, Self::DirError>;
 }
 
 
 
 pub mod dummydir;
 #[cfg(feature = "dir_tmpdir")]
-mod tmpdir;
+#[doc(cfg(feature = "dir_tmpdir"))]
+pub mod tmpdir;
