@@ -108,7 +108,7 @@ mod tests {
             &mut ByAttr::new("a"),
         )
         .unwrap();
-        let mut dir = dir.dump().into_iter().collect::<Vec<_>>();
+        let mut dir = dir.into_iter().collect::<Vec<_>>();
         dir.sort();
         assert_eq!(
             dir,

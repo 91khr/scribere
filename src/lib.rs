@@ -8,6 +8,7 @@
 #![feature(generic_associated_types)]
 #![feature(never_type)]
 #![feature(doc_cfg)]
+#![feature(extend_one)]
 
 
 
