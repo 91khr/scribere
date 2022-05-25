@@ -51,7 +51,7 @@ impl<F: Clone + for<'a> FnMut(Event<'a>) -> Option<CodeBlock<'a>>> Read for Read
     type Output<'a> = ReaderOut<'a, F> where F: 'a;
 
     fn read<'a>(&'a mut self, src: &'a mut super::SourceCode<'a, '_>) -> Result<Self::Output<'a>, Self::Error> {
-        src.to_owned_string()?;
+        src.try_into_owned()?;
         Ok(ReaderOut {
             filter: &mut self.filter,
             it: Parser::new(src.as_str().unwrap()),

@@ -39,7 +39,7 @@ pub fn write_blocks<'a, Dir: Directory>(
     it: &mut impl Iterator<Item = CodeBlock<'a>>,
     dir: &mut Dir,
     disp: &mut impl Dispatch<'a>,
-) -> Result<(), WriteError<Dir::DirError>> {
+) -> Result<(), WriteError<Dir::OpenError>> {
     let mut blk = match it.next() {
         Some(b) => b,
         None => return Ok(()),
