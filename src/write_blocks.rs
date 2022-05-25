@@ -36,9 +36,9 @@ pub enum WriteError<E: std::error::Error> {
 Write all code blocks in the iterator to the directory with the dispatcher.
 */
 pub fn write_blocks<'a, Dir: Directory>(
-    it: &mut impl Iterator<Item = CodeBlock<'a>>,
-    dir: &mut Dir,
+    mut it: impl Iterator<Item = CodeBlock<'a>>,
     disp: &mut impl Dispatch,
+    dir: &mut Dir,
 ) -> Result<(), WriteError<Dir::OpenError>> {
     let mut blk = match it.next() {
         Some(b) => b,
@@ -76,7 +76,7 @@ mod tests {
     fn some() {
         let mut dir = DummyDir::new();
         write_blocks(
-            &mut [
+            [
                 CodeBlock {
                     lang: "",
                     content: "block 1\n",
@@ -104,8 +104,8 @@ mod tests {
                 },
             ]
             .into_iter(),
-            &mut dir,
             &mut ByAttr::new("a"),
+            &mut dir,
         )
         .unwrap();
         let mut dir = dir.into_iter().collect::<Vec<_>>();
@@ -121,6 +121,6 @@ mod tests {
 
     #[test]
     fn empty_blocks() {
-        write_blocks(&mut [].into_iter(), &mut DummyDir::new(), &mut ByAttr::new("a")).unwrap();
+        write_blocks([].into_iter(), &mut ByAttr::new("a"), &mut DummyDir::new()).unwrap();
     }
 }
