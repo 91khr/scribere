@@ -54,10 +54,10 @@ impl<F: Clone + for<'a> FnMut(Event<'a>) -> Option<CodeBlock<'a>>> Read for Read
     type Error = std::io::Error;
 
     fn read<'a>(&mut self, src: &'a mut super::SourceCode<'a, '_>) -> Result<Self::Output<'a>, Self::Error> {
-        src.try_into_owned()?;
+        src.try_into_code()?;
         Ok(ReaderOut {
             filter: self.filter.clone(),
-            it: Parser::new(src.as_str().unwrap()),
+            it: Parser::new(src.as_code().unwrap()),
         })
     }
 }

@@ -79,7 +79,7 @@ mod tests {
             .walk()
             .unwrap()
             .map(|x| {
-                let mut path = x.unwrap().as_owned_file().unwrap().to_str().unwrap().to_string();
+                let mut path = x.unwrap().as_file().unwrap().to_str().unwrap().to_string();
                 assert!(path.starts_with(&base));
                 path.split_off(base.len() + 1)
             })
