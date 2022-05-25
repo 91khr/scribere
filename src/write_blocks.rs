@@ -38,7 +38,7 @@ Write all code blocks in the iterator to the directory with the dispatcher.
 pub fn write_blocks<'a, Dir: Directory>(
     it: &mut impl Iterator<Item = CodeBlock<'a>>,
     dir: &mut Dir,
-    disp: &mut impl Dispatch<'a>,
+    disp: &mut impl Dispatch,
 ) -> Result<(), WriteError<Dir::OpenError>> {
     let mut blk = match it.next() {
         Some(b) => b,

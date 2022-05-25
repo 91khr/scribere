@@ -23,13 +23,13 @@ Dispatch the code block to the file they should be put to.
 
 See the [module document](mod@self) for more details.
 */
-pub trait Dispatch<'a> {
+pub trait Dispatch {
     /// Dispatch the code block.
-    fn dispatch(&mut self, block: &CodeBlock<'a>) -> Option<&'a Path>;
+    fn dispatch<'a>(&'a mut self, block: &CodeBlock<'a>) -> Option<&'a Path>;
 }
 
-impl<'a, T: FnMut(&CodeBlock<'a>) -> Option<&'a Path>> Dispatch<'a> for T {
-    fn dispatch(&mut self, block: &CodeBlock<'a>) -> Option<&'a Path> {
+impl<T: for<'a> FnMut(&CodeBlock<'a>) -> Option<&'a Path>> Dispatch for T {
+    fn dispatch<'a>(&mut self, block: &CodeBlock<'a>) -> Option<&'a Path> {
         (self)(block)
     }
 }

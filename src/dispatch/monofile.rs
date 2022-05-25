@@ -34,8 +34,8 @@ impl<'a> From<&'a Path> for MonoFile<'a> {
     }
 }
 
-impl<'a> Dispatch<'a> for MonoFile<'a> {
-    fn dispatch(&mut self, _block: &CodeBlock<'a>) -> Option<&'a Path> {
+impl Dispatch for MonoFile<'_> {
+    fn dispatch<'a>(&'a mut self, _block: &CodeBlock<'a>) -> Option<&'a Path> {
         self.0.take()
     }
 }

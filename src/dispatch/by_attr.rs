@@ -28,8 +28,8 @@ impl<'a> ByAttr<'a> {
     }
 }
 
-impl<'a> Dispatch<'a> for ByAttr<'_> {
-    fn dispatch(&mut self, block: &CodeBlock<'a>) -> Option<&'a std::path::Path> {
+impl Dispatch for ByAttr<'_> {
+    fn dispatch<'a>(&mut self, block: &CodeBlock<'a>) -> Option<&'a std::path::Path> {
         block.attrs.iter().find(|x| x.0 == self.0).map(|x| Path::new(x.1))
     }
 }
