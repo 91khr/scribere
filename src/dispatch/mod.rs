@@ -25,11 +25,11 @@ See the [module document](mod@self) for more details.
 */
 pub trait Dispatch {
     /// Dispatch the code block.
-    fn dispatch<'a>(&'a mut self, block: &CodeBlock<'a>) -> Option<&'a Path>;
+    fn dispatch<'a>(&'a mut self, block: &'a CodeBlock<'a>) -> Option<&'a Path>;
 }
 
-impl<T: for<'a> FnMut(&CodeBlock<'a>) -> Option<&'a Path>> Dispatch for T {
-    fn dispatch<'a>(&mut self, block: &CodeBlock<'a>) -> Option<&'a Path> {
+impl<T: for<'a> FnMut(&'a CodeBlock<'a>) -> Option<&'a Path>> Dispatch for T {
+    fn dispatch<'a>(&mut self, block: &'a CodeBlock<'a>) -> Option<&'a Path> {
         (self)(block)
     }
 }

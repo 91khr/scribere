@@ -22,6 +22,13 @@ pub struct Reader<F: Clone + for<'a> FnMut(Event<'a>) -> Option<CodeBlock<'a>>> 
     filter: F,
 }
 
+impl<F: Clone + for<'a> FnMut(Event<'a>) -> Option<CodeBlock<'a>>> Reader<F> {
+    /// Construct a new reader with the filter.
+    pub fn new(filter: F) -> Self {
+        Self { filter }
+    }
+}
+
 /**
 The output type of [`Reader::read`].
 */
@@ -54,7 +61,7 @@ impl<F: Clone + for<'a> FnMut(Event<'a>) -> Option<CodeBlock<'a>>> Read for Read
     type Error = std::io::Error;
 
     fn read<'a>(&mut self, src: &'a mut super::SourceCode<'a, '_>) -> Result<Self::Output<'a>, Self::Error> {
-        src.try_into_code()?;
+        src.to_code()?;
         Ok(ReaderOut {
             filter: self.filter.clone(),
             it: Parser::new(src.as_code().unwrap()),
@@ -65,4 +72,40 @@ impl<F: Clone + for<'a> FnMut(Event<'a>) -> Option<CodeBlock<'a>>> Read for Read
 
 
 #[cfg(test)]
-mod tests {}
+mod tests {
+    use super::Reader;
+    use crate::codeblock::CodeBlock;
+    use crate::read::Read;
+
+    #[test]
+    fn some() {
+        let mut rd = Reader::new(|e| match e {
+            pulldown_cmark::Event::Code(x) => Some(CodeBlock {
+                lang: "".into(),
+                content: x.to_string().into(),
+                attrs: vec![],
+            }),
+            _ => None,
+        });
+        let mut c1 = "hello `print(world)` hi".into();
+        let mut c2 = "`CodeBlocks`".into();
+        let a = rd.read(&mut c1).unwrap();
+        let b = rd.read(&mut c2).unwrap();
+        assert_eq!(
+            a.collect::<Vec<_>>(),
+            vec![CodeBlock {
+                lang: "".into(),
+                content: "print(world)".into(),
+                attrs: vec![],
+            }]
+        );
+        assert_eq!(
+            b.collect::<Vec<_>>(),
+            vec![CodeBlock {
+                lang: "".into(),
+                content: "CodeBlocks".into(),
+                attrs: vec![],
+            }]
+        );
+    }
+}

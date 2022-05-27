@@ -53,7 +53,7 @@ mod tests {
     #[test]
     fn some() {
         let mut mono = MonoFile::new(Path::new("a"));
-        assert_eq!(mono.dispatch(&CodeBlock::new()), Some(Path::new("a")));
-        assert_eq!(mono.dispatch(&CodeBlock::new()), None);
+        assert_eq!(mono.dispatch(&CodeBlock::default()), Some(Path::new("a")));
+        assert_eq!(mono.dispatch(&CodeBlock::default()), None);
     }
 }

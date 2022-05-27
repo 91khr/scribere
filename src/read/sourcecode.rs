@@ -10,7 +10,11 @@ use std::path::{Path, PathBuf};
 
 
 /**
-The source to be read, can be a owned or borrowed string, or a path.
+The source to be read, can be a string or a path to the source file, and can be owned or borrowed.
+
+This is a pointer type to the actual data.
+
+`File`s can be converted to `Code`s with [`to_code`], by reading them into the memory.
 */
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum SourceCode<'str, 'path> {
@@ -27,11 +31,19 @@ impl<'a, 'b> SourceCode<'a, 'b> {
     }
 
     /// Convert self into an owned string, either by copying or reading the file.
-    pub fn try_into_code(&mut self) -> Result<(), std::io::Error> {
+    pub fn to_code(&mut self) -> Result<(), std::io::Error> {
         if let Self::File(p) = self {
             *self = std::fs::read_to_string(p)?.into();
         }
         Ok(())
+    }
+
+    /// Convert self into owned, and extend lifetime.
+    pub fn into_owned<'str, 'file>(self) -> SourceCode<'str, 'file> {
+        match self {
+            Self::Code(x) => SourceCode::Code(Cow::Owned(x.into_owned())),
+            Self::File(x) => SourceCode::File(Cow::Owned(x.into_owned())),
+        }
     }
 
     /// Returns the code string if self is a code string, otherwise `None`.

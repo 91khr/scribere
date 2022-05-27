@@ -4,6 +4,7 @@ Dispatch the code blocks to files according to their attributes.
 
 
 
+use std::borrow::Cow;
 use std::path::Path;
 
 use super::Dispatch;
@@ -29,8 +30,12 @@ impl<'a> ByAttr<'a> {
 }
 
 impl Dispatch for ByAttr<'_> {
-    fn dispatch<'a>(&mut self, block: &CodeBlock<'a>) -> Option<&'a std::path::Path> {
-        block.attrs.iter().find(|x| x.0 == self.0).map(|x| Path::new(x.1))
+    fn dispatch<'a>(&mut self, block: &'a CodeBlock<'a>) -> Option<&'a std::path::Path> {
+        block
+            .attrs
+            .iter()
+            .find(|x| x.0 == self.0)
+            .map(|x| Path::new(Cow::as_ref(&x.1)))
     }
 }
 
@@ -47,12 +52,17 @@ mod tests {
     fn some() {
         let mut disp = ByAttr::new("a");
         assert_eq!(
-            disp.dispatch(CodeBlock::new().with_attrs(vec![("b", "qaq"), ("a", "qwq")])),
+            disp.dispatch(
+                CodeBlock::default().with_attrs(vec![("b".into(), "qaq".into()), ("a".into(), "qwq".into())])
+            ),
             Some(Path::new("qwq"))
         );
-        assert_eq!(disp.dispatch(CodeBlock::new().with_attrs(vec![("b", "qwq")])), None);
         assert_eq!(
-            disp.dispatch(CodeBlock::new().with_attrs(vec![("a", "qeq")])),
+            disp.dispatch(CodeBlock::default().with_attrs(vec![("b".into(), "qwq".into())])),
+            None
+        );
+        assert_eq!(
+            disp.dispatch(CodeBlock::default().with_attrs(vec![("a".into(), "qeq".into())])),
             Some(Path::new("qeq"))
         );
     }

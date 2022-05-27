@@ -18,30 +18,35 @@ use crate::dispatch::Dispatch;
 The result of writing operations.
 */
 #[derive(Debug, Error)]
-pub enum WriteError<E: std::error::Error> {
+pub enum WriteError<D: std::error::Error, B: std::error::Error> {
     /// The path returned by dispatcher for the first code block is `None`.
     #[error("dispatcher returned `None` for the first code block")]
     NullPath,
     /// The error returned from the directory.
     #[error("directory error: {0}")]
-    DirError(E),
+    DirError(D),
     /// The error during writing.
     #[error("IO error: {0}")]
     IOError(std::io::Error),
+    /// The error while iterating the code blocks.
+    #[error("iterating blocks error: {0}")]
+    BlockError(B),
 }
 
 
 
 /**
-Write all code blocks in the iterator to the directory with the dispatcher.
+Write all code blocks in the iterator to the directory with the dispatcher,
+where the iterator may yield an error.
 */
-pub fn write_blocks<'a, Dir: Directory>(
-    mut it: impl Iterator<Item = CodeBlock<'a>>,
+pub fn write_blocks_mayerr<'a, Dir: Directory, E: std::error::Error>(
+    mut it: impl Iterator<Item = Result<CodeBlock<'a>, E>>,
     disp: &mut impl Dispatch,
     dir: &mut Dir,
-) -> Result<(), WriteError<Dir::OpenError>> {
+) -> Result<(), WriteError<Dir::OpenError, E>> {
     let mut blk = match it.next() {
-        Some(b) => b,
+        Some(Ok(b)) => b,
+        Some(Err(e)) => return Err(WriteError::BlockError(e)),
         None => return Ok(()),
     };
     let mut path = disp.dispatch(&blk).ok_or(WriteError::NullPath)?;
@@ -50,7 +55,8 @@ pub fn write_blocks<'a, Dir: Directory>(
         loop {
             writer.write_all(blk.content.as_bytes()).map_err(WriteError::IOError)?;
             blk = match it.next() {
-                Some(b) => b,
+                Some(Ok(b)) => b,
+                Some(Err(e)) => return Err(WriteError::BlockError(e)),
                 None => return Ok(()),
             };
             if let Some(p) = disp.dispatch(&blk) {
@@ -59,6 +65,21 @@ pub fn write_blocks<'a, Dir: Directory>(
             }
         }
     }
+}
+
+/**
+Write all code blocks in the iterator to the directory with the dispatcher,
+where the iterator won't yield errors.
+
+The function forwards to [`write_blocks_mayerr`],
+for detailed document, see its document.
+*/
+pub fn write_blocks<'a, Dir: Directory>(
+    it: impl Iterator<Item = CodeBlock<'a>>,
+    disp: &mut impl Dispatch,
+    dir: &mut Dir,
+) -> Result<(), WriteError<Dir::OpenError, !>> {
+    write_blocks_mayerr(it.map(Ok), disp, dir)
 }
 
 
@@ -78,29 +99,29 @@ mod tests {
         write_blocks(
             [
                 CodeBlock {
-                    lang: "",
-                    content: "block 1\n",
-                    attrs: vec![("a", "hello")],
+                    lang: "".into(),
+                    content: "block 1\n".into(),
+                    attrs: vec![("a".into(), "hello".into())],
                 },
                 CodeBlock {
-                    lang: "",
-                    content: "block 2\n",
-                    attrs: vec![("b", "hello")],
+                    lang: "".into(),
+                    content: "block 2\n".into(),
+                    attrs: vec![("b".into(), "hello".into())],
                 },
                 CodeBlock {
-                    lang: "",
-                    content: "block 3\n",
-                    attrs: vec![("a", "hi")],
+                    lang: "".into(),
+                    content: "block 3\n".into(),
+                    attrs: vec![("a".into(), "hi".into())],
                 },
                 CodeBlock {
-                    lang: "",
-                    content: "block 4\n",
-                    attrs: vec![("a", "hello")],
+                    lang: "".into(),
+                    content: "block 4\n".into(),
+                    attrs: vec![("a".into(), "hello".into())],
                 },
                 CodeBlock {
-                    lang: "",
-                    content: "block 5\n",
-                    attrs: vec![("b", "hello")],
+                    lang: "".into(),
+                    content: "block 5\n".into(),
+                    attrs: vec![("b".into(), "hello".into())],
                 },
             ]
             .into_iter(),
