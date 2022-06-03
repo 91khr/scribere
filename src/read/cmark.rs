@@ -8,7 +8,7 @@ Read markdown with the [pulldown-cmark] library.
 
 use pulldown_cmark::{Event, Parser};
 
-use super::{Read, ReadOut};
+use super::{Read, ReadOut, SourceCode};
 use crate::codeblock::CodeBlock;
 
 
@@ -60,7 +60,7 @@ impl<F: Clone + for<'a> FnMut(Event<'a>) -> Option<CodeBlock<'a>>> ReadOut for R
 impl<F: Clone + for<'a> FnMut(Event<'a>) -> Option<CodeBlock<'a>>> Read for Reader<F> {
     type Error = std::io::Error;
 
-    fn read<'a>(&mut self, src: &'a mut super::SourceCode<'a, '_>) -> Result<Self::Output<'a>, Self::Error> {
+    fn read<'a>(&mut self, src: &'a mut SourceCode<'a, '_>) -> Result<Self::Output<'a>, Self::Error> {
         src.to_code()?;
         Ok(ReaderOut {
             filter: self.filter.clone(),

@@ -14,7 +14,8 @@ The source to be read, can be a string or a path to the source file, and can be 
 
 This is a pointer type to the actual data.
 
-`File`s can be converted to `Code`s with [`to_code`], by reading them into the memory.
+`File`s can be converted to `Code`s with [`to_code`](Self::to_code),
+by reading them into the memory.
 */
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub enum SourceCode<'str, 'path> {

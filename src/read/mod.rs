@@ -1,5 +1,5 @@
 /*!
-Read the code blocks in the source.
+Reading from sources and return information in them.
 */
 
 
