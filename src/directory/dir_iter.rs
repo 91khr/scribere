@@ -39,7 +39,7 @@ impl<'a> Iterator for DirIter<'a> {
     type Item = Result<SourceCode<'a, 'a>, Error>;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let item = match self.state.last_mut().unwrap().next() {
+        let item = match self.state.last_mut().expect("State shouldn't be empty").next() {
             None => {
                 self.state.pop();
                 return if self.state.is_empty() { None } else { self.next() };

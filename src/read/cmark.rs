@@ -64,7 +64,7 @@ impl<F: Clone + for<'a> FnMut(Event<'a>) -> Option<CodeBlock<'a>>> Read for Read
         src.to_code()?;
         Ok(ReaderOut {
             filter: self.filter.clone(),
-            it: Parser::new(src.as_code().unwrap()),
+            it: Parser::new(src.as_code().expect("`src` should be code after conversion")),
         })
     }
 }

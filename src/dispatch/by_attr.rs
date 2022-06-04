@@ -87,7 +87,7 @@ where
                 blk.attrs
                     .iter()
                     .find(|x| x.0 == self.name)
-                    .map(|x| PathBuf::from_str(Cow::as_ref(&x.1)).unwrap()),
+                    .map(|x| PathBuf::from_str(Cow::as_ref(&x.1)).expect("Infallible?")),
                 blk,
             ))),
             Some(Err(e)) => Some(Err(e)),
