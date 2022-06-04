@@ -19,8 +19,16 @@ pub struct CodeBlock<'a> {
 
 impl<'a> CodeBlock<'a> {
     /// Create an empty codeblock.
-    pub fn new(lang: Cow<'a, str>, content: Cow<'a, str>, attrs: Vec<(Cow<'a, str>, Cow<'a, str>)>) -> Self {
-        Self { lang, content, attrs }
+    pub fn new(
+        lang: impl Into<Cow<'a, str>>,
+        content: impl Into<Cow<'a, str>>,
+        attrs: Vec<(Cow<'a, str>, Cow<'a, str>)>,
+    ) -> Self {
+        Self {
+            lang: lang.into(),
+            content: content.into(),
+            attrs,
+        }
     }
 
     /// Set lang and return self.
@@ -44,6 +52,6 @@ impl<'a> CodeBlock<'a> {
 
 impl Default for CodeBlock<'_> {
     fn default() -> Self {
-        Self::new(Default::default(), Default::default(), Default::default())
+        Self::new("", "", vec![])
     }
 }
