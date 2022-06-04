@@ -19,6 +19,32 @@ Dispatch the code blocks to files according to their attributes.
 The name of the attribute must be given, and when the attribute is absent,
 the code block would be dispatched to the same file as the last code block.
 The first code block should have the attribute, or the writer would raise an error.
+
+Example:
+
+```
+use scribere::CodeBlock;
+use scribere::dispatch::{Event, DispatchErrless, ByAttr};
+use std::path::Path;
+
+let mut disp = ByAttr::new("name");
+let ctnt = [
+        CodeBlock::new("", "1", vec![("name".into(), "a".into())]),
+        CodeBlock::new("", "2", vec![]),
+    ]
+    .into_iter();
+assert_eq!(
+    disp.dispatch(ctnt).collect::<Vec<_>>(),
+    vec![
+        Event::new_some(
+            Path::new("a"),
+            CodeBlock::new("", "1", vec![("name".into(), "a".into())]),
+        ),
+        Event::new_none(CodeBlock::new("", "2", vec![]))
+    ]
+);
+```
+
 */
 #[derive(Copy, Clone, Debug, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct ByAttr<'a> {
@@ -76,10 +102,10 @@ impl Dispatch for ByAttr<'_> {
         Self: 'a,
         It: Iterator<Item = Result<CodeBlock<'a>, E>>;
 
-    fn dispatch<'a, E: std::error::Error, It: Iterator<Item = Result<CodeBlock<'a>, E>>>(
-        &'a mut self,
-        iter: It,
-    ) -> Self::Output<'a, It, E> {
+    fn dispatch<'a, It, E: std::error::Error>(&'a self, iter: It) -> Self::Output<'a, It, E>
+    where
+        It: Iterator<Item = Result<CodeBlock<'a>, E>>,
+    {
         Iter { name: self.name, iter }
     }
 }
@@ -87,30 +113,4 @@ impl Dispatch for ByAttr<'_> {
 
 
 #[cfg(test)]
-mod tests {
-    use std::borrow::Cow;
-    use std::path::Path;
-
-    use crate::codeblock::CodeBlock;
-    use crate::dispatch::{ByAttr, DispatchErrless, Event};
-
-    #[test]
-    fn some() {
-        let mut disp = ByAttr::new("a");
-        let iter = [
-            CodeBlock::new("", "1", vec![("a".into(), "qwq".into())]),
-            CodeBlock::new("", "2", vec![]),
-        ]
-        .into_iter();
-        assert_eq!(
-            disp.dispatch_errless(iter).collect::<Vec<_>>(),
-            vec![
-                Event::new(
-                    Some(Cow::from(Path::new("qwq"))),
-                    CodeBlock::new("", "1", vec![("a".into(), "qwq".into())])
-                ),
-                Event::new::<&Path>(None, CodeBlock::new("", "2", vec![]))
-            ]
-        );
-    }
-}
+mod tests {}

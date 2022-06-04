@@ -47,7 +47,9 @@ pub fn write_blocks<'a, Dir: Directory, E: std::error::Error>(
         None => return Ok(()),
     };
     loop {
-        let mut writer = dir.open_append(&event.target.unwrap()).map_err(WriteError::DirError)?;
+        let mut writer = dir
+            .open_append(&event.target.ok_or(WriteError::NullPath)?)
+            .map_err(WriteError::DirError)?;
         loop {
             writer
                 .write_all(event.block.content.as_bytes())
@@ -122,7 +124,7 @@ mod tests {
             (PathBuf::from("hi"), b"block 3\n".to_vec()),
         ];
         let mut dir = DummyDir::new();
-        write_blocks_errless(&mut ByAttr::new("a").dispatch_errless(ctnt), &mut dir).unwrap();
+        write_blocks_errless(&mut ByAttr::new("a").dispatch(ctnt), &mut dir).unwrap();
         let mut dir = dir.into_iter().collect::<Vec<_>>();
         dir.sort();
         assert_eq!(dir, res);
@@ -130,10 +132,6 @@ mod tests {
 
     #[test]
     fn empty_blocks() {
-        write_blocks_errless(
-            &mut ByAttr::new("a").dispatch_errless([].into_iter()),
-            &mut DummyDir::new(),
-        )
-        .unwrap();
+        write_blocks_errless(&mut ByAttr::new("a").dispatch([].into_iter()), &mut DummyDir::new()).unwrap();
     }
 }

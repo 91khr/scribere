@@ -4,15 +4,19 @@
 #![warn(missing_copy_implementations)]
 #![warn(missing_debug_implementations)]
 #![warn(rustdoc::all)]
+//# Don't want to enforce everything to have an example
+//# --- such document may be too complicated ><
 #![allow(rustdoc::missing_doc_code_examples)]
 #![feature(generic_associated_types)]
 #![feature(never_type)]
 #![feature(doc_cfg)]
 #![feature(extend_one)]
+#![feature(lint_reasons)]
 
 
 
 mod codeblock;
+pub use codeblock::CodeBlock;
 mod cowstr;
 
 pub mod directory;

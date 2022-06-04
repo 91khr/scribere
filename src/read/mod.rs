@@ -11,9 +11,7 @@ use crate::codeblock::CodeBlock;
 
 
 /**
-The result type container for [`Read`].
-
-For detailed document, see [the document of `Read`](Read).
+The result type container for [`Read`], see [its document](Read) for more.
 */
 pub trait ReadOut {
     /// The result iterator.
