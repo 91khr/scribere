@@ -8,9 +8,8 @@ use std::io::Write;
 
 use thiserror::Error;
 
-use crate::codeblock::CodeBlock;
 use crate::directory::Directory;
-use crate::dispatch::Dispatch;
+use crate::dispatch::Event;
 
 
 
@@ -36,50 +35,45 @@ pub enum WriteError<D: std::error::Error, B: std::error::Error> {
 
 
 /**
-Write all code blocks in the iterator to the directory with the dispatcher,
-where the iterator may yield an error.
+Write all code blocks in the iterator according to its dispatching targets.
 */
-pub fn write_blocks_mayerr<'a, Dir: Directory, E: std::error::Error>(
-    mut it: impl Iterator<Item = Result<CodeBlock<'a>, E>>,
-    disp: &mut impl Dispatch,
+pub fn write_blocks<'a, Dir: Directory, E: std::error::Error>(
+    mut it: impl Iterator<Item = Result<Event<'a>, E>>,
     dir: &mut Dir,
 ) -> Result<(), WriteError<Dir::OpenError, E>> {
-    let mut blk = match it.next() {
-        Some(Ok(b)) => b,
+    let mut event = match it.next() {
+        Some(Ok(e)) => e,
         Some(Err(e)) => return Err(WriteError::BlockError(e)),
         None => return Ok(()),
     };
-    let mut path = disp.dispatch(&blk).ok_or(WriteError::NullPath)?;
     loop {
-        let mut writer = dir.open_append(path).map_err(WriteError::DirError)?;
+        let mut writer = dir.open_append(&event.target.unwrap()).map_err(WriteError::DirError)?;
         loop {
-            writer.write_all(blk.content.as_bytes()).map_err(WriteError::IOError)?;
-            blk = match it.next() {
-                Some(Ok(b)) => b,
+            writer
+                .write_all(event.block.content.as_bytes())
+                .map_err(WriteError::IOError)?;
+            match it.next() {
+                Some(Ok(e)) => {
+                    event = e;
+                    if event.target.is_some() {
+                        break;
+                    }
+                }
                 Some(Err(e)) => return Err(WriteError::BlockError(e)),
                 None => return Ok(()),
-            };
-            if let Some(p) = disp.dispatch(&blk) {
-                path = p;
-                break;
             }
         }
     }
 }
 
 /**
-Write all code blocks in the iterator to the directory with the dispatcher,
-where the iterator won't yield errors.
-
-The function forwards to [`write_blocks_mayerr`],
-for detailed document, see its document.
+Write all code blocks in the errorless iterator according to its dispatching targets.
 */
-pub fn write_blocks<'a, Dir: Directory>(
-    it: impl Iterator<Item = CodeBlock<'a>>,
-    disp: &mut impl Dispatch,
+pub fn write_blocks_errless<'a, Dir: Directory>(
+    it: impl Iterator<Item = Event<'a>>,
     dir: &mut Dir,
 ) -> Result<(), WriteError<Dir::OpenError, !>> {
-    write_blocks_mayerr(it.map(Ok), disp, dir)
+    write_blocks(it.map(Ok), dir)
 }
 
 
@@ -90,58 +84,56 @@ mod tests {
 
     use crate::codeblock::CodeBlock;
     use crate::directory::dummydir::DummyDir;
-    use crate::dispatch::ByAttr;
-    use crate::write_blocks;
+    use crate::dispatch::{ByAttr, DispatchErrless};
+    use crate::write_blocks::write_blocks_errless;
 
     #[test]
     fn some() {
+        let ctnt = [
+            CodeBlock {
+                lang: "".into(),
+                content: "block 1\n".into(),
+                attrs: vec![("a".into(), "hello".into())],
+            },
+            CodeBlock {
+                lang: "".into(),
+                content: "block 2\n".into(),
+                attrs: vec![("b".into(), "hello".into())],
+            },
+            CodeBlock {
+                lang: "".into(),
+                content: "block 3\n".into(),
+                attrs: vec![("a".into(), "hi".into())],
+            },
+            CodeBlock {
+                lang: "".into(),
+                content: "block 4\n".into(),
+                attrs: vec![("a".into(), "hello".into())],
+            },
+            CodeBlock {
+                lang: "".into(),
+                content: "block 5\n".into(),
+                attrs: vec![("b".into(), "hello".into())],
+            },
+        ]
+        .into_iter();
+        let res = [
+            (PathBuf::from("hello"), b"block 1\nblock 2\nblock 4\nblock 5\n".to_vec()),
+            (PathBuf::from("hi"), b"block 3\n".to_vec()),
+        ];
         let mut dir = DummyDir::new();
-        write_blocks(
-            [
-                CodeBlock {
-                    lang: "".into(),
-                    content: "block 1\n".into(),
-                    attrs: vec![("a".into(), "hello".into())],
-                },
-                CodeBlock {
-                    lang: "".into(),
-                    content: "block 2\n".into(),
-                    attrs: vec![("b".into(), "hello".into())],
-                },
-                CodeBlock {
-                    lang: "".into(),
-                    content: "block 3\n".into(),
-                    attrs: vec![("a".into(), "hi".into())],
-                },
-                CodeBlock {
-                    lang: "".into(),
-                    content: "block 4\n".into(),
-                    attrs: vec![("a".into(), "hello".into())],
-                },
-                CodeBlock {
-                    lang: "".into(),
-                    content: "block 5\n".into(),
-                    attrs: vec![("b".into(), "hello".into())],
-                },
-            ]
-            .into_iter(),
-            &mut ByAttr::new("a"),
-            &mut dir,
-        )
-        .unwrap();
+        write_blocks_errless(&mut ByAttr::new("a").dispatch_errless(ctnt), &mut dir).unwrap();
         let mut dir = dir.into_iter().collect::<Vec<_>>();
         dir.sort();
-        assert_eq!(
-            dir,
-            [
-                (PathBuf::from("hello"), b"block 1\nblock 2\nblock 4\nblock 5\n".to_vec()),
-                (PathBuf::from("hi"), b"block 3\n".to_vec())
-            ]
-        );
+        assert_eq!(dir, res);
     }
 
     #[test]
     fn empty_blocks() {
-        write_blocks([].into_iter(), &mut ByAttr::new("a"), &mut DummyDir::new()).unwrap();
+        write_blocks_errless(
+            &mut ByAttr::new("a").dispatch_errless([].into_iter()),
+            &mut DummyDir::new(),
+        )
+        .unwrap();
     }
 }

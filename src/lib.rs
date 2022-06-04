@@ -19,8 +19,9 @@ pub mod directory;
 pub mod dispatch;
 pub mod read;
 
-mod write_blocks;
-pub use write_blocks::write_blocks;
+pub mod write_blocks;
+#[doc(inline)]
+pub use write_blocks::{write_blocks, write_blocks_errless};
 
 
 
