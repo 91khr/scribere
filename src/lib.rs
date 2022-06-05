@@ -18,7 +18,6 @@
 
 mod codeblock;
 pub use codeblock::CodeBlock;
-mod cowstr;
 
 pub mod directory;
 pub mod dispatch;
