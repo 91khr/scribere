@@ -9,10 +9,10 @@ A code block in the source.
 */
 #[derive(Debug, Clone, Hash, PartialEq, Eq, PartialOrd, Ord)]
 pub struct CodeBlock<'a> {
-    /// The language of the code block.
-    pub lang: Cow<'a, str>,
     /// The content of the code block.
     pub content: Cow<'a, str>,
+    /// The language of the code block.
+    pub lang: Cow<'a, str>,
     /// The attributes of the code block.
     pub attrs: Vec<(Cow<'a, str>, Cow<'a, str>)>,
 }
@@ -20,13 +20,13 @@ pub struct CodeBlock<'a> {
 impl<'a> CodeBlock<'a> {
     /// Create an empty codeblock.
     pub fn new(
-        lang: impl Into<Cow<'a, str>>,
         content: impl Into<Cow<'a, str>>,
+        lang: impl Into<Cow<'a, str>>,
         attrs: Vec<(Cow<'a, str>, Cow<'a, str>)>,
     ) -> Self {
         Self {
-            lang: lang.into(),
             content: content.into(),
+            lang: lang.into(),
             attrs,
         }
     }

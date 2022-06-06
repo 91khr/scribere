@@ -39,14 +39,14 @@ use scribere::dispatch::{Event, DispatchErrless, ByAttr};
 use std::path::Path;
 
 let ctnt = [
-        CodeBlock::new("", "1", vec![
+        CodeBlock::new("1", "", vec![
             ("name".into(), "target".into()),
             ("unrelated".into(), "unrel".into())
             ]),
-        CodeBlock::new("", "2", vec![("rand".into(), "attr".into())]),
-        CodeBlock::new("", "3", vec![("another".into(), "rand attr".into())]),
-        CodeBlock::new("", "4", vec![("name".into(), "another target".into())]),
-        CodeBlock::new("", "5", vec![("last".into(), "block".into())]),
+        CodeBlock::new("2", "", vec![("rand".into(), "attr".into())]),
+        CodeBlock::new("3", "", vec![("another".into(), "rand attr".into())]),
+        CodeBlock::new("4", "", vec![("name".into(), "another target".into())]),
+        CodeBlock::new("5", "", vec![("last".into(), "block".into())]),
     ]
     .into_iter();
 let disp = ByAttr::new("name");
@@ -54,17 +54,17 @@ let res = disp.dispatch(ctnt).collect::<Vec<_>>();
 assert_eq!(
     res,
     vec![
-        Event::new_some(Path::new("target"), CodeBlock::new("", "1", vec![
+        Event::new_some(Path::new("target"), CodeBlock::new("1", "", vec![
             ("name".into(), "target".into()),
             ("unrelated".into(), "unrel".into())
             ])),
-        Event::new_none(CodeBlock::new("", "2", vec![("rand".into(), "attr".into())])),
-        Event::new_none(CodeBlock::new("", "3", vec![("another".into(), "rand attr".into())])),
+        Event::new_none(CodeBlock::new("2", "", vec![("rand".into(), "attr".into())])),
+        Event::new_none(CodeBlock::new("3", "", vec![("another".into(), "rand attr".into())])),
         Event::new_some(
             Path::new("another target"),
-            CodeBlock::new("", "4", vec![("name".into(), "another target".into())]),
+            CodeBlock::new("4", "", vec![("name".into(), "another target".into())]),
         ),
-        Event::new_none(CodeBlock::new("", "5", vec![("last".into(), "block".into())])),
+        Event::new_none(CodeBlock::new("5", "", vec![("last".into(), "block".into())])),
     ],
 );
 ```

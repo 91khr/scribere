@@ -29,8 +29,8 @@ use std::path::Path;
 
 let mut disp = ByAttr::new("name");
 let ctnt = [
-        CodeBlock::new("", "1", vec![("name".into(), "a".into())]),
-        CodeBlock::new("", "2", vec![]),
+        CodeBlock::new("1", "", vec![("name".into(), "a".into())]),
+        CodeBlock::new("2", "", vec![]),
     ]
     .into_iter();
 assert_eq!(
@@ -38,9 +38,9 @@ assert_eq!(
     vec![
         Event::new_some(
             Path::new("a"),
-            CodeBlock::new("", "1", vec![("name".into(), "a".into())]),
+            CodeBlock::new("1", "", vec![("name".into(), "a".into())]),
         ),
-        Event::new_none(CodeBlock::new("", "2", vec![]))
+        Event::new_none(CodeBlock::new("2", "", vec![]))
     ]
 );
 ```
