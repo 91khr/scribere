@@ -29,7 +29,7 @@ let mut mono = MonoFile::new(Path::new("a"));
 let iter = [CodeBlock::new("1", "", vec![]), CodeBlock::new("2", "", vec![])].into_iter();
 assert_eq!(
     mono.dispatch(iter).collect::<Vec<_>>(),
-    vec![
+    [
         Event::new_some(Path::new("a"), CodeBlock::new("1", "", vec![])),
         Event::new_none(CodeBlock::new("2", "", vec![]))
     ]

@@ -53,7 +53,7 @@ let disp = ByAttr::new("name");
 let res = disp.dispatch(ctnt).collect::<Vec<_>>();
 assert_eq!(
     res,
-    vec![
+    [
         Event::new_some(Path::new("target"), CodeBlock::new("1", "", vec![
             ("name".into(), "target".into()),
             ("unrelated".into(), "unrel".into())

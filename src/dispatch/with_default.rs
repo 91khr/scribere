@@ -79,13 +79,13 @@ let ctnt = [
     .into_iter();
 let after = ctnt.clone().with_default(Path::new("default")).collect::<Vec<_>>();
 assert_eq!(
-    vec![
+    after,
+    [
         Event::new_some(Path::new("default"), CodeBlock::new("1", "", vec![])),
         Event::new_none(CodeBlock::new("2", "", vec![])),
         Event::new_some(Path::new("change"), CodeBlock::new("3", "", vec![])),
         Event::new_none(CodeBlock::new("4", "", vec![])),
-    ],
-    after
+    ]
 );
 ```
 
@@ -103,11 +103,11 @@ let ctnt = [
     .into_iter();
 let after = ctnt.clone().with_default(Path::new("default")).collect::<Vec<_>>();
 assert_eq!(
-    vec![
+    after,
+    [
         Event::new_some(Path::new("given"), CodeBlock::new("1", "", vec![])),
         Event::new_none(CodeBlock::new("2", "", vec![])),
-    ],
-    after
+    ]
 );
 ```
 
@@ -190,12 +190,12 @@ mod tests {
         .into_iter();
         let after = ctnt.clone().with_default(Path::new("b")).collect::<Vec<_>>();
         assert_eq!(
-            vec![
+            after,
+            [
                 Event::new_some(Path::new("b"), CodeBlock::new("1", "", vec![])),
                 Event::new_none(CodeBlock::new("2", "", vec![])),
                 Event::new_some(Path::new("c"), CodeBlock::new("3", "", vec![])),
             ],
-            after
         );
     }
 }

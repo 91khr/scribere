@@ -35,7 +35,7 @@ let ctnt = [
     .into_iter();
 assert_eq!(
     disp.dispatch(ctnt).collect::<Vec<_>>(),
-    vec![
+    [
         Event::new_some(
             Path::new("a"),
             CodeBlock::new("1", "", vec![("name".into(), "a".into())]),
